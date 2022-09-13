@@ -27,3 +27,5 @@ printName()
 garfieldThread = Thread(target=printGarfield)
 
 garfieldThread.start()
+
+print("End of code")
