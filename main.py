@@ -24,6 +24,7 @@ scrnSize = (640, 360)
 blink = 1
 leftHand = 1
 rightHand = 1
+settingToggle = 0
 
 # Images
 
@@ -36,6 +37,8 @@ handUpRight = pg.image.load("handUpRight.png").convert_alpha()
 mouth = pg.image.load("U.png").convert_alpha()
 handDownLeft = pg.image.load("handDownLeft.png").convert_alpha()
 handDownRight = pg.image.load("handDownRight.png").convert_alpha()
+checked = pg.image.load("checked.png").convert_alpha()
+unchecked = pg.image.load("unchecked.png").convert_alpha()
 
 # Functions
 
@@ -50,8 +53,7 @@ def blinkTick():
 
 def keyCheck():
     print("keyCheck thread running")
-    global leftHand
-    global rightHand
+    global leftHand, rightHand, settingToggle
     while True:
         keys=pg.key.get_pressed()
         if keys[pg.K_d]:
@@ -63,7 +65,14 @@ def keyCheck():
             rightHand = 0
         else:
             rightHand = 1
-                
+
+        for event in pg.event.get() :
+            if event.type == pg.KEYDOWN :
+                if event.key == pg.K_ESCAPE :
+                    if settingToggle == 0:
+                        settingToggle = 1
+                    else:
+                        settingToggle = 0
 
 # Threads 
 
@@ -79,34 +88,42 @@ keyCheckThread.start()
 while running:
 
     screen.fill(bgColor) #erases old sprites
-    screen.blit(baseImg, origin)
-    screen.blit(table, origin)
 
-    # Eyes Blinking
+    if settingToggle == 0:
 
-    if blink == 0:
-        screen.blit(eyesOpen, origin)
+        screen.blit(baseImg, origin)
+        screen.blit(table, origin)
+
+        # Eyes Blinking
+
+        if blink == 0:
+            screen.blit(eyesOpen, origin)
+        else:
+            screen.blit(eyesClosed, origin)
+
+        # Hand Movement
+
+        if leftHand == 0:
+            screen.blit(handDownLeft, origin)
+        else:
+            screen.blit(handUpLeft, origin)
+        
+        if rightHand == 0:
+            screen.blit(handDownRight, origin)
+        else:
+            screen.blit(handUpRight, origin)
+
+        # mouth
+
+        # if rightHand == 0 and leftHand == 0:
+        # screen.blit(mouth, origin)
+
     else:
-        screen.blit(eyesClosed, origin)
-
-    # Hand Movement
-
-    if leftHand == 0:
-        screen.blit(handDownLeft, origin)
-    else:
-        screen.blit(handUpLeft, origin)
-    
-    if rightHand == 0:
-        screen.blit(handDownRight, origin)
-    else:
-        screen.blit(handUpRight, origin)
-
-    # mouth
-
-#    if rightHand == 0 and leftHand == 0:
-#        screen.blit(mouth, origin)
+        pass
 
     pg.display.flip() #Updates screen
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+        if event.type == pg.MOUSEBUTTONDOWN:
+            x, y = event.pos
